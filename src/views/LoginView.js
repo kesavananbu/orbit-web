@@ -17,6 +17,10 @@ import RootStoreContext from '../context/RootStoreContext'
 
 import '../styles/LoginView.scss'
 
+import { CookieStorage } from 'cookie-storage';
+
+const cookieStorage = new CookieStorage();
+
 const BackgroundAnimation = LoadAsync({
   loader: () =>
     import(/* webpackChunkName: "BackgroundAnimation" */ '../components/BackgroundAnimation')
@@ -43,15 +47,30 @@ class LoginView extends React.Component {
 
   componentDidMount () {
     const { uiStore } = this.context
-    uiStore.setTitle('Login | Orbit')
+    uiStore.setTitle('Login')
     uiStore.closeControlPanel()
   }
 
-  onConfigure () {
+  async onConfigure () {
     logger.warn('Settings view not implemented')
-  }
-
-  onLogin (e, username) {
+    for(var i=0; i < cookieStorage.length ; i++ )
+      cookieStorage.removeItem(cookieStorage.key(i))
+    var databases = await indexedDB.databases()
+    for (var i = 0; i < databases.length; i++){
+      var database = await databases[i]
+      indexedDB.deleteDatabase(database.name)
+      logger.warn(databases[i].name+' Deleted Successfully')
+      }   
+    var backup = [{}]
+    for (var i = 0; i < localStorage.length; i++){
+      var key = localStorage.key(i)   
+      var value = localStorage.getItem(key)
+      backup[key]=value
+    }  
+    logger.warn('BackupCompleted')
+   }
+ 
+  onLogin (e, username, password) {
     const { sessionStore } = this.context
 
     e.preventDefault()
@@ -86,7 +105,7 @@ class LoginView extends React.Component {
           transitionEnterTimeout={5000}
           transitionLeaveTimeout={5000}
         >
-          <h1 onClick={this.focusUsernameInput}>Orbit</h1>
+          <h1 onClick={this.focusUsernameInput}>IPFS ORBIT</h1>
         </CSSTransitionGroup>
         <LoginForm
           theme={{ ...uiStore.theme }}
