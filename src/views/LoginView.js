@@ -119,7 +119,7 @@ class LoginView extends React.Component {
           transitionEnterTimeout={5000}
           transitionLeaveTimeout={5000}
         >
-          <h1 onClick={this.focusUsernameInput}>Orbit</h1>
+          <h1 onClick={this.focusUsernameInput}>IPFS Orbit</h1>
         </CSSTransitionGroup>
         <LoginForm
           theme={{ ...uiStore.theme }}
