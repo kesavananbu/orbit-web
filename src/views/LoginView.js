@@ -47,7 +47,7 @@ class LoginView extends React.Component {
 
   componentDidMount () {
     const { uiStore } = this.context
-    uiStore.setTitle('Login | Orbit')
+    uiStore.setTitle('Login')
     uiStore.closeControlPanel()
   }
 
