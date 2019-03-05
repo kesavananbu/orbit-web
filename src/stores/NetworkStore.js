@@ -8,10 +8,6 @@ import OrbitStore from './OrbitStore'
 
 import Logger from '../utils/logger'
 
-
-//const OrbitDB = require('orbit-db')
-
-
 configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
@@ -161,15 +157,20 @@ export default class NetworkStore {
     logger.info('Starting network')
 
     await this.ipfsStore.useEmbeddedIPFS()
-    const orbitNode = await this.orbitStore.init(this.ipfs)
-    
+    const orbitNode = await this.orbitStore.init(this.ipfs)  
     try{
-    const db=await orbitNode._orbitdb.open('/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND/UsersCredentials',{directory: '/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND'})
+    const db=await orbitNode._orbitdb.open('/orbitdb/zdpuB1v242gA37cPuPxnCzifBRjY9YuGq1GEr8jW1hNn378FJ/UsersCredentials')
     //const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
+    //const db address => /orbitdb/zdpuB1v242gA37cPuPxnCzifBRjY9YuGq1GEr8jW1hNn378FJ/UsersCredentials
+    //const access = {
+    //  write : ['*'],
+    //}
+    //const db = await orbitNode._orbitdb.keyvalue('UsersCredentials',access)
     logger.warn("HI HI HI")
-    await db.set('dev','{"dev":"DEVELOPER"}')
-    const result = await db.get('dev')
-    logger.warn(result,'....Fetching')
+    //await db.set('dev','{"dev":"DEVELOPER"}')
+    //const result = await db.get('dev')
+    const dbAddress = db.address.toString()
+    logger.warn(dbAddress,' ....Database Address')
     await db.stop()
     }
     catch(err)

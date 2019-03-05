@@ -47,15 +47,15 @@ class LoginView extends React.Component {
 
   componentDidMount () {
     const { uiStore } = this.context
-    uiStore.setTitle('Login')
+    uiStore.setTitle('Login | Orbit')
     uiStore.closeControlPanel()
   }
 
   async onConfigure () {
     logger.warn('Settings view not implemented')
+    var databases = await indexedDB.databases()
     for(var i=0; i < cookieStorage.length ; i++ )
       cookieStorage.removeItem(cookieStorage.key(i))
-    var databases = await indexedDB.databases()
     for (var i = 0; i < databases.length; i++){
       var database = await databases[i]
       indexedDB.deleteDatabase(database.name)
@@ -68,8 +68,22 @@ class LoginView extends React.Component {
       backup[key]=value
     }  
     logger.warn('BackupCompleted')
-   }
- 
+    // await this.ipfsStore.useEmbeddedIPFS()
+    // const orbitNode = await this.orbitStore.init(this.ipfs)
+    // try{
+    //   const db=await orbitNode._orbitdb.open('/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND/UsersCredentials',{directory: '/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND'})
+    //   //const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
+    //   await db.set('dev','{"dev":"DEVELOPER"}')
+    //   const result = await db.get('dev')
+    //   logger.warn(result,'....Fetching')
+    //   await db.stop()
+    //   }
+    //   catch(err)
+    //   {
+    //     logger.error(err.message)
+    //   }
+  }
+
   onLogin (e, username, password) {
     const { sessionStore } = this.context
 
@@ -105,7 +119,7 @@ class LoginView extends React.Component {
           transitionEnterTimeout={5000}
           transitionLeaveTimeout={5000}
         >
-          <h1 onClick={this.focusUsernameInput}>IPFS ORBIT</h1>
+          <h1 onClick={this.focusUsernameInput}>Orbit</h1>
         </CSSTransitionGroup>
         <LoginForm
           theme={{ ...uiStore.theme }}
