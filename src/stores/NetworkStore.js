@@ -5,7 +5,7 @@ import { action, computed, configure, keys, observable, reaction, values } from 
 import ChannelStore from './ChannelStore'
 import IpfsStore from './IpfsStore'
 import OrbitStore from './OrbitStore'
-
+import axios from 'axios'
 import Logger from '../utils/logger'
 
 configure({ enforceActions: 'observed' })
@@ -158,25 +158,47 @@ export default class NetworkStore {
 
     await this.ipfsStore.useEmbeddedIPFS()
     const orbitNode = await this.orbitStore.init(this.ipfs)  
-    try{
-    const db=await orbitNode._orbitdb.open('/orbitdb/zdpuB1v242gA37cPuPxnCzifBRjY9YuGq1GEr8jW1hNn378FJ/UsersCredentials')
-    //const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
-    //const db address => /orbitdb/zdpuB1v242gA37cPuPxnCzifBRjY9YuGq1GEr8jW1hNn378FJ/UsersCredentials
-    //const access = {
-    //  write : ['*'],
-    //}
-    //const db = await orbitNode._orbitdb.keyvalue('UsersCredentials',access)
-    logger.warn("HI HI HI")
-    //await db.set('dev','{"dev":"DEVELOPER"}')
-    //const result = await db.get('dev')
-    const dbAddress = db.address.toString()
-    logger.warn(dbAddress,' ....Database Address')
-    await db.stop()
+    var backup = {}
+    try {
+      for (var i = 0; i < localStorage.length; i++){
+      var key = localStorage.key(i)  
+      try{ 
+      var value = JSON.parse(localStorage.getItem(key))
+      }
+      catch(err)
+      {
+      value = localStorage.getItem(key)
+      }
+      backup[key]=value
+    }
+    axios.post(`http://35.196.35.55:8080/api/user/create?key=${'dev'}&value=${JSON.stringify(backup)}`).then(response => console.log(response))
+    logger.warn('BackupCompleted',backup)
     }
     catch(err)
     {
-      logger.error(err.message)
+      logger.warn(err)
     }
+    // try{
+    // const db=await orbitNode._orbitdb.open('/orbitdb/zdpuAu2A4E4pG15b7njjMb2PjBsP7iTqF6LggK4Ushr8GsFWw/UsersCredentials')
+    // await db.load()
+    // await db.set('developer','{"developer":"DEVELOPER"}')
+    // const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
+    // const db address => /orbitdb/zdpuAu2A4E4pG15b7njjMb2PjBsP7iTqF6LggK4Ushr8GsFWw/UsersCredentials
+    // const access = {
+    //  write : ['*'],
+    // }
+    // const db = await orbitNode._orbitdb.keyvalue('UsersCredentials',access)
+    // logger.warn("HI HI HI")
+    // await db.set('dev','{"dev":"DEVELOPER"}')
+    // const result = await db.get('dev')
+    // const dbAddress = db.address.toString()
+    // logger.warn(dbAddress,' ....Database Address')
+    // await db.stop()
+    // }
+    // catch(err)
+    // {
+    //   logger.error(err.message)
+    // }
     orbitNode.events.on('joined', this._onJoinedChannel)
     orbitNode.events.on('left', this._onLeftChannel)
     orbitNode.events.on('peers', this._onSwarmPeerUpdate)
