@@ -18,7 +18,7 @@ import RootStoreContext from '../context/RootStoreContext'
 import '../styles/LoginView.scss'
 
 import { CookieStorage } from 'cookie-storage';
-
+import axios from 'axios'
 const cookieStorage = new CookieStorage();
 
 const BackgroundAnimation = LoadAsync({
@@ -53,35 +53,29 @@ class LoginView extends React.Component {
 
   async onConfigure () {
     logger.warn('Settings view not implemented')
-    var databases = await indexedDB.databases()
+    //var databases = await indexedDB.databases()
     for(var i=0; i < cookieStorage.length ; i++ )
       cookieStorage.removeItem(cookieStorage.key(i))
-    for (var i = 0; i < databases.length; i++){
-      var database = await databases[i]
-      indexedDB.deleteDatabase(database.name)
-      logger.warn(databases[i].name+' Deleted Successfully')
-      }   
-    var backup = [{}]
+    // for (var i = 0; i < databases.length; i++){
+    //   var database = await databases[i]
+    //   indexedDB.deleteDatabase(database.name)
+    //   logger.warn(databases[i].name+' Deleted Successfully')
+    //   }
     for (var i = 0; i < localStorage.length; i++){
       var key = localStorage.key(i)   
-      var value = localStorage.getItem(key)
-      backup[key]=value
-    }  
+      localStorage.removeItem(key)
+    }
+    const result =await axios.get(`http://35.196.35.55:8080/api/user/fetch?key=${'dev'}`)
+    const resultextract=JSON.parse(result.data.Message)
+    for (var key in resultextract)
+    {
+      if (resultextract.hasOwnProperty(key)) {
+        const value = resultextract[key]
+        localStorage.setItem(key,typeof(value)=='object'?JSON.stringify(value):value)
+      }
+    }
     logger.warn('BackupCompleted')
-    // await this.ipfsStore.useEmbeddedIPFS()
-    // const orbitNode = await this.orbitStore.init(this.ipfs)
-    // try{
-    //   const db=await orbitNode._orbitdb.open('/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND/UsersCredentials',{directory: '/orbitdb/QmRnETbQ2bL12xPQQTRLAgkPGCE5pD8XJzefn6prJJd6ND'})
-    //   //const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
-    //   await db.set('dev','{"dev":"DEVELOPER"}')
-    //   const result = await db.get('dev')
-    //   logger.warn(result,'....Fetching')
-    //   await db.stop()
-    //   }
-    //   catch(err)
-    //   {
-    //     logger.error(err.message)
-    //   }
+    
   }
 
   onLogin (e, username, password) {
