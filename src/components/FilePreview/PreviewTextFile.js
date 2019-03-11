@@ -2,32 +2,33 @@
 
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import LoadAsync from '../Loadable'
 
-import Highlight from '../Highlight'
 
 import { getFileExtension } from '../../utils/file-helpers'
+
+const Highlight = LoadAsync({
+  loader: () => import(/* webpackChunkName: "Highlight" */ '../Highlight')
+})
+
 
 function PreviewTextFile ({ blob, filename, ...rest }) {
   const [fileContent, setfileContent] = useState(null)
 
-  useEffect(
-    () => {
-      const fileReader = new FileReader()
-      fileReader.onload = ({ target: { result } }) => {
+  useEffect(() => {
+      const fileReader = new FileReader()  
+      fileReader.onload = ({ target: { result } }) => {   
         setfileContent(
           <Highlight extension={getFileExtension(filename)} {...rest}>
-            {result}
-          </Highlight>
+          {result}</Highlight>
         )
-      }
-      fileReader.onerror = () => {
-        fileReader.abort()
+      }	    
+      fileReader.onerror = () => {	      
+        fileReader.abort()	      
         throw new Error('Unable to read file')
-      }
+        }
       fileReader.readAsText(blob, 'utf-8')
-    },
-    [filename]
-  )
+      }, [filename])
 
   return fileContent || null
 }

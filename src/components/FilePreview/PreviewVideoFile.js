@@ -3,6 +3,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { toArrayBuffer } from '../../utils/file-helpers'
+import Logger from '../../utils/logger'
+
+const logger = new Logger()
 
 function PreviewVideoFile ({ src, stream, filename, mimeType, ...rest }) {
   const isElectron = !!window.ipfsInstance
@@ -47,7 +50,7 @@ function PreviewVideoFile ({ src, stream, filename, mimeType, ...rest }) {
               if (source.readyState === 'open' && !sourceBuffer.updating) source.endOfStream()
             }, 100)
           })
-          stream.on('error', e => console.error(e))
+          stream.on('error', e => logger.warn(e))
         }
       })
   }
