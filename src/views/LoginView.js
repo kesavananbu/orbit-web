@@ -46,9 +46,10 @@ class LoginView extends React.Component {
   }
 
   componentDidMount () {
-    const { uiStore } = this.context
+    const { uiStore,networkStore } = this.context
     uiStore.setTitle('Login')
     uiStore.closeControlPanel()
+    this.AccessGuest = networkStore
   }
 
   async onConfigure () {
@@ -79,6 +80,8 @@ class LoginView extends React.Component {
   }
 
   onLogin (e, username, password) {
+
+    
     const { sessionStore } = this.context
 
     e.preventDefault()

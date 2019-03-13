@@ -1,11 +1,13 @@
 'use strict'
 
-import { action, computed, configure, keys, observable, reaction, values } from 'mobx'
+import { action, computed, configure, keys, observable, reaction, values, autorun } from 'mobx'
 
 import ChannelStore from './ChannelStore'
 import IpfsStore from './IpfsStore'
 import OrbitStore from './OrbitStore'
-import axios from 'axios'
+import GuestStore from './GuestStore'
+import OrbitDB from 'orbit-db'
+//import axios from 'axios'
 import Logger from '../utils/logger'
 
 configure({ enforceActions: 'observed' })
@@ -22,6 +24,7 @@ export default class NetworkStore {
 
     this.ipfsStore = new IpfsStore(this)
     this.orbitStore = new OrbitStore(this)
+    this.guestStore = new GuestStore(this)
 
     this.joinChannel = this.joinChannel.bind(this)
 
@@ -41,6 +44,10 @@ export default class NetworkStore {
         else if (!(this.isOnline || this.starting)) this.start()
       }
     )
+    autorun( reaction => {
+      this.load()
+    reaction.dispose();
+    },{delay:100});
   }
 
   // Public instance variables
@@ -151,36 +158,52 @@ export default class NetworkStore {
       await this.orbit.leave(channelName)
     }
   }
+  
+  async get_userrecord(key){
+    return new Promise(function(resolve,reject)
+    {
+        if(this.db.get(key) !=
+    })
+  }
 
-  async start () {
+  async load(){
     if (this.isOnline) return
     logger.info('Starting network')
-
     await this.ipfsStore.useEmbeddedIPFS()
-    const orbitNode = await this.orbitStore.init(this.ipfs)  
-    var backup = {}
-    try {
-      for (var i = 0; i < localStorage.length; i++){
-      var key = localStorage.key(i)  
-      try{ 
-      var value = JSON.parse(localStorage.getItem(key))
-      }
-      catch(err)
-      {
-      value = localStorage.getItem(key)
-      }
-      backup[key]=value
-    }
-    axios.post(`http://35.196.35.55:8080/api/user/create?key=${'dev'}&value=${JSON.stringify(backup)}`).then(response => console.log(response))
-    logger.warn('BackupCompleted',backup)
-    }
-    catch(err)
-    {
-      logger.warn(err)
-    }
+    const orbitNode = await this.guestStore.init(this.ipfs)
+    const db=await orbitNode._orbitdb.open('/orbitdb/zdpuB1S886QjTfFAbTwZMXe9eeMf5suH9rC4M3GkYtQZ1qQPh/UsersCredentials')
+    await db.load()
+    db.events.on("replicated", () => {
+    const result = db.get('dev')
+    //db.set('developer','{"developer":"DEVELOPER"}')
+    logger.warn(result," Resut")
+    })
+    const result = db.get('dev')
+    logger.warn(result," Resut")
+    const dbAddress = db.address.toString()
+    logger.warn(dbAddress,' ....Database Address')
+    // var backup = {}
+    // try {
+    //   for (var i = 0; i < localStorage.length; i++){
+    //   var key = localStorage.key(i)  
+    //   try{ 
+    //   var value = JSON.parse(localStorage.getItem(key))
+    //   }
+    //   catch(err)
+    //   {
+    //   value = localStorage.getItem(key)
+    //   }
+    //   backup[key]=value
+    // }
+    // axios.post(`http://35.196.35.55:8080/api/user/create?key=${'dev'}&value=${JSON.stringify(backup)}`).then(response => console.log(response))
+    // logger.warn('BackupCompleted',backup)
+    // }
+    // catch(err)
+    // {
+    //   logger.warn(err)
+    // }
     // try{
-    // const db=await orbitNode._orbitdb.open('/orbitdb/zdpuAu2A4E4pG15b7njjMb2PjBsP7iTqF6LggK4Ushr8GsFWw/UsersCredentials')
-    // await db.load()
+    
     // await db.set('developer','{"developer":"DEVELOPER"}')
     // const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
     // const db address => /orbitdb/zdpuAu2A4E4pG15b7njjMb2PjBsP7iTqF6LggK4Ushr8GsFWw/UsersCredentials
@@ -190,19 +213,22 @@ export default class NetworkStore {
     // const db = await orbitNode._orbitdb.keyvalue('UsersCredentials',access)
     // logger.warn("HI HI HI")
     // await db.set('dev','{"dev":"DEVELOPER"}')
-    // const result = await db.get('dev')
-    // const dbAddress = db.address.toString()
-    // logger.warn(dbAddress,' ....Database Address')
+    
     // await db.stop()
     // }
     // catch(err)
     // {
     //   logger.error(err.message)
     // }
+  }
+  async start () {
+    if (this.isOnline) return
+    logger.info('Starting network')
+    await this.ipfsStore.useEmbeddedIPFS()
+    const orbitNode = await this.orbitStore.init(this.ipfs)  
     orbitNode.events.on('joined', this._onJoinedChannel)
     orbitNode.events.on('left', this._onLeftChannel)
     orbitNode.events.on('peers', this._onSwarmPeerUpdate)
-
     // Join all channnels that are saved in localstorage for current user
     this.settingsStore.networkSettings.channels.forEach(this.joinChannel)
   }
