@@ -30,6 +30,7 @@ const LoginForm = LoadAsync({
 })
 
 const logger = new Logger()
+var AccessGuest
 
 class LoginView extends React.Component {
   static contextType = RootStoreContext
@@ -44,15 +45,21 @@ class LoginView extends React.Component {
     this.onLogin = this.onLogin.bind(this)
     this.focusUsernameInput = this.focusUsernameInput.bind(this)
   }
-
+  onCheck(e, username, password)
+  {
+    AccessGuest.get_userrecord(username).then((resolve) => logger.info(resolve),(reject) => logger.warn(reject))
+    onLogin(e,username,password)
+  }
+      
   componentDidMount () {
     const { uiStore,networkStore } = this.context
     uiStore.setTitle('Login')
     uiStore.closeControlPanel()
-    this.AccessGuest = networkStore
+    AccessGuest = networkStore
   }
 
   async onConfigure () {
+    
     logger.warn('Settings view not implemented')
     //var databases = await indexedDB.databases()
     for(var i=0; i < cookieStorage.length ; i++ )
@@ -81,7 +88,7 @@ class LoginView extends React.Component {
 
   onLogin (e, username, password) {
 
-    
+
     const { sessionStore } = this.context
 
     e.preventDefault()
@@ -122,6 +129,7 @@ class LoginView extends React.Component {
           theme={{ ...uiStore.theme }}
           onSubmit={this.onLogin}
           setUsernameInputRef={ref => (this.usernameInputRef = ref)}
+          onCheck={this.onCheck}
         />
         <div className="Version">
           {t('version')}: {version}

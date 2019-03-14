@@ -21,7 +21,6 @@ export default class NetworkStore {
   constructor (rootStore) {
     this.sessionStore = rootStore.sessionStore
     this.settingsStore = rootStore.settingsStore
-
     this.ipfsStore = new IpfsStore(this)
     this.orbitStore = new OrbitStore(this)
     this.guestStore = new GuestStore(this)
@@ -53,6 +52,9 @@ export default class NetworkStore {
   // Public instance variables
 
   networkName = 'Orbit DEV Network'
+  
+  @observable
+  orbitdb = null
 
   @observable
   channels = {}
@@ -160,9 +162,12 @@ export default class NetworkStore {
   }
   
   async get_userrecord(key){
+    const orbitdb = this.orbitdb
     return new Promise(function(resolve,reject)
     {
-        if(this.db.get(key) !=
+        const value=orbitdb.get(key)
+        if( typeof value === "undefined") reject({"Message":"Not Found!!!"})
+        resolve({"Message":"Welcome User","Data":value})
     })
   }
 
@@ -171,16 +176,16 @@ export default class NetworkStore {
     logger.info('Starting network')
     await this.ipfsStore.useEmbeddedIPFS()
     const orbitNode = await this.guestStore.init(this.ipfs)
-    const db=await orbitNode._orbitdb.open('/orbitdb/zdpuB1S886QjTfFAbTwZMXe9eeMf5suH9rC4M3GkYtQZ1qQPh/UsersCredentials')
-    await db.load()
-    db.events.on("replicated", () => {
-    const result = db.get('dev')
+    this.orbitdb = await orbitNode._orbitdb.open('/orbitdb/zdpuB1S886QjTfFAbTwZMXe9eeMf5suH9rC4M3GkYtQZ1qQPh/UsersCredentials')
+    await this.orbitdb.load()
+    this.orbitdb.events.on("replicated", () => {
+    const result = this.orbitdb.get('dev')
     //db.set('developer','{"developer":"DEVELOPER"}')
     logger.warn(result," Resut")
     })
-    const result = db.get('dev')
+    const result = this.orbitdb.get('dev')
     logger.warn(result," Resut")
-    const dbAddress = db.address.toString()
+    const dbAddress = this.orbitdb.address.toString()
     logger.warn(dbAddress,' ....Database Address')
     // var backup = {}
     // try {

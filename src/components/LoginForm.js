@@ -8,8 +8,9 @@ import { useTranslation } from 'react-i18next'
 import '../styles/SubmitButton.scss'
 import '../styles/InputField.scss'
 
-function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
+function LoginForm ({ theme, onSubmit, setUsernameInputRef, onCheck }) {
   const [t] = useTranslation()
+  var message
   const [usernameLength, setUsernameLength] = useState(0)
   const [passwordLength, setPasswordLength] = useState(0)
 
@@ -27,7 +28,7 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
   })
 
   return (
-    <form onSubmit={e => passwordLength > 0 ?(onSubmit(e, usernameInputRef.current.value.trim(),passwordInputRef.current.value.trim())):(PasswordRequired=true)}>
+    <form onSubmit={e => passwordLength > 0 ?(onCheck(e, usernameInputRef.current.value.trim(),passwordInputRef.current.value.trim())):(PasswordRequired=true)}>
       <CSSTransitionGroup
         transitionName="loginScreenAnimation"
         transitionAppear={true}
@@ -58,8 +59,9 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
            />
         </div>
         <div className="connectButtonRow">
-          <span className="hint">{usernameLength > 0 ? t('login.pressEnterToLogin') : PasswordRequired=false }</span>
+          <span className="hint">{(usernameLength >0  && passwordLength > 0) ? t('login.pressEnterToLogin') : PasswordRequired=false }</span>
           <span className="hint">{usernameLength > 0 ? null : (PasswordRequired = true ? t('Please provide the username and password'): null )}</span>
+          <span className="hint">{t(usernameLength)}</span>
           <input type="submit" value="Connect" style={{ display: 'none' }} />
         </div>
       </CSSTransitionGroup>
@@ -70,7 +72,8 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef }) {
 LoginForm.propTypes = {
   theme: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  setUsernameInputRef: PropTypes.func
+  setUsernameInputRef: PropTypes.func,
+  onCheck: PropTypes.func.isRequired
 }
 
 export default LoginForm
