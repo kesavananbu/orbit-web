@@ -40,18 +40,13 @@ export default class NetworkStore {
         else if (!(this.isOnline || this.starting)) this.start().then(res => this.update_credentials())
       }
     )
-
-    // autorun( reaction => {
-    //   if(!(this.isOnline || this.starting)) this.load()
-    //   reaction.dispose();
-    //   },{delay:100});
     
     
   }
 
   // Public instance variables
 
-  networkName = 'Orbit DEV Network'
+  networkName = 'IPFS Orbit Network'
 
   @observable
   channels = {}
@@ -162,13 +157,12 @@ export default class NetworkStore {
     
   async update_channels()
   {
-    logger.warn("Updating Channels")
     var channel_settings = {}
     channel_settings[`orbit-chat.${this.sessionStore.username}.network-settings`] = JSON.parse(localStorage.getItem(`orbit-chat.${this.sessionStore.username}.network-settings`))
     channel_settings[`orbit-chat.${this.sessionStore.username}.network-settings`].channels= this.channelNames
     const user_channel= encrypt(JSON.stringify(channel_settings),this.sessionStore.password)
     const user_channelkey = md5(`${this.sessionStore.username}[channels]`)
-    this.set_userrecord(user_channelkey,user_channel,false).then(res => logger.info('Updated Channels'))
+    this.set_userrecord(user_channelkey,user_channel,false)
 
   }
 
@@ -177,7 +171,6 @@ export default class NetworkStore {
     if(this.sessionStore.IsNeedUpdate)
     {
       var user_private_store = {}
-      logger.warn(this.sessionStore.username,this.sessionStore.password)
       user_private_store[this.sessionStore.username]=JSON.parse(localStorage.getItem(this.sessionStore.username))
       user_private_store[user_private_store[this.sessionStore.username]['publicKey']]=JSON.parse(localStorage.getItem(user_private_store[this.sessionStore.username]['publicKey']))
       const user_store= encrypt(JSON.stringify(user_private_store),this.sessionStore.password)
@@ -201,18 +194,6 @@ export default class NetworkStore {
     bigchain.setData(asset,metadata)
   }
 
-  // async load(){
-  //   if (this.ipfs) return
-  //   logger.info('Starting network')
-  //   if(!this.ipfsStore.starting)
-  //   await this.ipfsStore.useEmbeddedIPFS()
-  //   const orbitNode = await this.guestStore.init(this.ipfs)
-  //   this.orbitdb = await orbitNode._orbitdb.open('/orbitdb/zdpuB1S886QjTfFAbTwZMXe9eeMf5suH9rC4M3GkYtQZ1qQPh/UsersCredentials')
-  //   await this.orbitdb.load()
-  //   this.orbitdb.events.on("replicated", () => {
-  //   logger.info("Replicated")
-  //   })
-  // }
   async start () {
     if (this.isOnline) return
     logger.info('Starting network')

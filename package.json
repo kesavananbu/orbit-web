@@ -1,7 +1,7 @@
 {
   "name": "orbit-web",
   "version": "1.0.0",
-  "description": "Orbit Chat",
+  "description": "IPFS Orbit Chat",
   "main": "src/components/index.js",
   "scripts": {
     "dev": "./node_modules/.bin/webpack-dev-server --mode=development",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/orbitdb/orbit-web.git"
+    "url": "git+https://github.com/kesavananbu/orbit-web.git"
   },
   "keywords": [
     "orbitdb",
@@ -30,9 +30,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/orbitdb/orbit-web/issues"
+    "url": "https://github.com/kesavananbu/orbit-web/issues"
   },
-  "homepage": "https://github.com/orbitdb/orbit-web#readme",
+  "homepage": "https://github.com/kesavananbu/orbit-web#readme",
   "browserslist": [
     "> 0.5%",
     "last 2 versions",
@@ -44,7 +44,6 @@
     "axios": "^0.18.0",
     "bigchaindb-driver": "^4.1.0",
     "classnames": "^2.2.6",
-    "cookie-storage": "^3.2.0",
     "crypto-js": "^3.1.9-1",
     "date-fns": "^1.29.0",
     "domkit": "0.0.1",
@@ -53,6 +52,7 @@
     "i18next": "^14.0.1",
     "ipfs": "^0.34.4",
     "ipfs-http-client": "^29.1.1",
+    "isemail": "^3.2.0",
     "mobx": "^5.5.2",
     "mobx-react": "^5.4.2",
     "orbit_": "github:orbitdb/orbit-core#dev/overall-refactor",
@@ -65,7 +65,8 @@
     "react-loadable": "^5.5.0",
     "react-router-dom": "^4.3.1",
     "react-transition-group": "^1.2.1",
-    "semantic-ui-react": "^0.86.0"
+    "semantic-ui-react": "^0.86.0",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",

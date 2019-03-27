@@ -18,9 +18,7 @@ import RootStoreContext from '../context/RootStoreContext'
 
 import '../styles/LoginView.scss'
 import * as driver from 'bigchaindb-driver'
-import { CookieStorage } from 'cookie-storage';
 
-const cookieStorage = new CookieStorage();
 
 const BackgroundAnimation = LoadAsync({
   loader: () =>
@@ -52,17 +50,20 @@ class LoginView extends React.Component {
   }
 
   state = {
-    error : false
+    error : false,
+    errormsg : ''
   }
 
-  errorhandle = (value) => this.setState({ error : value})
-
+  errorhandle = (value,msg='') => this.setState({ error : value, errormsg : msg})
 
   onCheck(e, username, password, signup)
   {
     if(signup == true)
     {
-    this.onLogin(e,username,password,true)
+    AccessGuest.get_userrecord(md5(username),true).then(
+      (resolve) => this.onError(e,'User Already Exist'),
+      (reject) => this.onLogin(e,username,password,true))
+      
     }
     else
     {
@@ -72,8 +73,8 @@ class LoginView extends React.Component {
           AccessGuest.get_userrecord(md5(`${username}[channels]`)).then(
             (resolve) => this.validateData(resolve,password).then(res => this.onLogin(e,username,password)),
             (reject) =>  this.onLogin(e,username,password))
-            : this.onError(e)),
-      (reject) => this.onError(e))
+            : this.onError(e,'Username or Password is incorrect')),
+      (reject) => this.onError(e,'Username not found'))
     }
     
   }
@@ -105,12 +106,6 @@ class LoginView extends React.Component {
     AccessGuest = networkStore
   }
 
-  async onConfigure () {
-    this.errorhandle(!this.state.error)
-  }
-
-
-
   onLogin (e, username, password,update=false) {
 
     const { sessionStore } = this.context
@@ -126,10 +121,10 @@ class LoginView extends React.Component {
     }
   }
 
-  onError (e)
+  onError (e,msg)
   { 
     e.preventDefault()
-    this.errorhandle(true)
+    this.errorhandle(true,msg)
   }
 
   focusUsernameInput () {
@@ -167,19 +162,12 @@ class LoginView extends React.Component {
           setPasswordInputRef={ref => (this.passwordInputRef = ref)}
           onCheck={this.onCheck}
           error = {this.state.error}
+          errorhandle = {this.errorhandle}
+          errormsg = {this.state.errormsg}          
         />
-
         <div className="Version">
           {t('version')}: {version}
         </div>
-        <button
-          type="button"
-          className="ConfigurationButton submitButton"
-          style={{ ...uiStore.theme }}
-          onClick={this.onConfigure}
-        >
-          {t('configuration')}
-        </button>
         <BackgroundAnimation
           size={480}
           theme={{ ...uiStore.theme }}

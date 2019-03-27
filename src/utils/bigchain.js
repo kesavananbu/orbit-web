@@ -32,7 +32,7 @@ export function setData(asset,metadata)
     )
     // Sign the transaction with private keys
     const txSigned = driver.Transaction.signTransaction(tx, user.privateKey)
-    conn.postTransactionCommit(txSigned).then(retrievedTx => logger.warn('Transaction', retrievedTx.id, 'successfully posted.'))
+    conn.postTransactionCommit(txSigned)
 }
 
 export function getData(data, value)
@@ -41,7 +41,6 @@ export function getData(data, value)
     const assets =await conn.searchAssets(data)
     if(assets.length==0) reject("Failure")
     else{
-    logger.info(assets)
     const Userassets = assets.filter(asset => asset.data.datetime && (asset.data.IsUser==value) && (asset.data.User == data))
     const result = Userassets[Userassets.length-1]
     if(result) resolve(result)
@@ -49,20 +48,3 @@ export function getData(data, value)
     }
     })
 }
-
-// function maxasset_ofdate(assets) {
-
-//     return new Promise((resolve, reject) => {
-//     var max_asset = assets[0]
-//     var max_asset_dt = new Date(max_asset.data.datetime);
-//     assets.forEach(function(asset, index)
-//     {
-//     if ( new Date( asset.data.datetime ) > max_asset_dt)
-//     {
-//         max_asset = asset;
-//         max_asset_dt = new Date(asset.data.datetime);
-//     }
-//     });
-//     resolve(max_asset)
-//     })
-// }
