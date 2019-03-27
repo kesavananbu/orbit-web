@@ -5,10 +5,10 @@ import { action, computed, configure, keys, observable, reaction, values, autoru
 import ChannelStore from './ChannelStore'
 import IpfsStore from './IpfsStore'
 import OrbitStore from './OrbitStore'
-import GuestStore from './GuestStore'
 import OrbitDB from 'orbit-db'
-//import axios from 'axios'
 import Logger from '../utils/logger'
+import {encrypt_message,decrypt_message,encrypt,decrypt,md5} from '../utils/crypto'
+import * as bigchain from '../utils/bigchain'
 
 configure({ enforceActions: 'observed' })
 
@@ -23,10 +23,7 @@ export default class NetworkStore {
     this.settingsStore = rootStore.settingsStore
     this.ipfsStore = new IpfsStore(this)
     this.orbitStore = new OrbitStore(this)
-    this.guestStore = new GuestStore(this)
-
     this.joinChannel = this.joinChannel.bind(this)
-
     this.channelPeerInterval = setInterval(() => {
       this.channelsAsArray.forEach(c => c.updatePeers())
     }, peerUpdateInterval)
@@ -37,24 +34,24 @@ export default class NetworkStore {
 
     // Stop if user logs out, start if not already online or not starting
     reaction(
-      () => this.sessionStore.username,
-      username => {
-        if (!username) this.stop()
-        else if (!(this.isOnline || this.starting)) this.start()
+      () => this.sessionStore.user,
+      user => {
+        if (!user) this.stop()
+        else if (!(this.isOnline || this.starting)) this.start().then(res => this.update_credentials())
       }
     )
-    autorun( reaction => {
-      this.load()
-    reaction.dispose();
-    },{delay:100});
+
+    // autorun( reaction => {
+    //   if(!(this.isOnline || this.starting)) this.load()
+    //   reaction.dispose();
+    //   },{delay:100});
+    
+    
   }
 
   // Public instance variables
 
   networkName = 'Orbit DEV Network'
-  
-  @observable
-  orbitdb = null
 
   @observable
   channels = {}
@@ -146,86 +143,76 @@ export default class NetworkStore {
 
   // Public instance methods
 
-  async joinChannel (channelName) {
+  async joinChannel (channelName,value=false) {
     if (!this.isOnline) throw new Error('Network is not online')
     if (this.channelNames.indexOf(channelName) === -1) {
       await this.orbit.join(channelName)
+      if(value == true) this.update_channels()
     }
     return this.channels[channelName]
   }
 
-  async leaveChannel (channelName) {
+  async leaveChannel (channelName,value=false) {
     if (!this.isOnline) throw new Error('Network is not online')
     if (this.channelNames.indexOf(channelName) !== -1) {
       await this.orbit.leave(channelName)
+      if(value == true) this.update_channels()
     }
   }
-  
-  async get_userrecord(key){
-    const orbitdb = this.orbitdb
+    
+  async update_channels()
+  {
+    logger.warn("Updating Channels")
+    var channel_settings = {}
+    channel_settings[`orbit-chat.${this.sessionStore.username}.network-settings`] = JSON.parse(localStorage.getItem(`orbit-chat.${this.sessionStore.username}.network-settings`))
+    channel_settings[`orbit-chat.${this.sessionStore.username}.network-settings`].channels= this.channelNames
+    const user_channel= encrypt(JSON.stringify(channel_settings),this.sessionStore.password)
+    const user_channelkey = md5(`${this.sessionStore.username}[channels]`)
+    this.set_userrecord(user_channelkey,user_channel,false).then(res => logger.info('Updated Channels'))
+
+  }
+
+  async update_credentials()
+  {
+    if(this.sessionStore.IsNeedUpdate)
+    {
+      var user_private_store = {}
+      logger.warn(this.sessionStore.username,this.sessionStore.password)
+      user_private_store[this.sessionStore.username]=JSON.parse(localStorage.getItem(this.sessionStore.username))
+      user_private_store[user_private_store[this.sessionStore.username]['publicKey']]=JSON.parse(localStorage.getItem(user_private_store[this.sessionStore.username]['publicKey']))
+      const user_store= encrypt(JSON.stringify(user_private_store),this.sessionStore.password)
+      const user_key = md5(this.sessionStore.username)
+      this.set_userrecord(user_key,user_store,true)
+      this.sessionStore.update(false)
+    }
+  }
+
+  async get_userrecord(key, value=false){
     return new Promise(function(resolve,reject)
     {
-        const value=orbitdb.get(key)
-        if( typeof value === "undefined") reject({"Message":"Not Found!!!"})
-        resolve({"Message":"Welcome User","Data":value})
+        bigchain.getData(key,value).then(res => resolve({"Message":"Success","Data":res.data.Message}), rej => reject({"Message":"Failure"}))
     })
   }
 
-  async load(){
-    if (this.isOnline) return
-    logger.info('Starting network')
-    await this.ipfsStore.useEmbeddedIPFS()
-    const orbitNode = await this.guestStore.init(this.ipfs)
-    this.orbitdb = await orbitNode._orbitdb.open('/orbitdb/zdpuB1S886QjTfFAbTwZMXe9eeMf5suH9rC4M3GkYtQZ1qQPh/UsersCredentials')
-    await this.orbitdb.load()
-    this.orbitdb.events.on("replicated", () => {
-    const result = this.orbitdb.get('dev')
-    //db.set('developer','{"developer":"DEVELOPER"}')
-    logger.warn(result," Resut")
-    })
-    const result = this.orbitdb.get('dev')
-    logger.warn(result," Resut")
-    const dbAddress = this.orbitdb.address.toString()
-    logger.warn(dbAddress,' ....Database Address')
-    // var backup = {}
-    // try {
-    //   for (var i = 0; i < localStorage.length; i++){
-    //   var key = localStorage.key(i)  
-    //   try{ 
-    //   var value = JSON.parse(localStorage.getItem(key))
-    //   }
-    //   catch(err)
-    //   {
-    //   value = localStorage.getItem(key)
-    //   }
-    //   backup[key]=value
-    // }
-    // axios.post(`http://35.196.35.55:8080/api/user/create?key=${'dev'}&value=${JSON.stringify(backup)}`).then(response => console.log(response))
-    // logger.warn('BackupCompleted',backup)
-    // }
-    // catch(err)
-    // {
-    //   logger.warn(err)
-    // }
-    // try{
-    
-    // await db.set('developer','{"developer":"DEVELOPER"}')
-    // const db = await orbitdb.open('/orbitdb/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7/users',{create:true,type:'keyvalue',write: ['*']})
-    // const db address => /orbitdb/zdpuAu2A4E4pG15b7njjMb2PjBsP7iTqF6LggK4Ushr8GsFWw/UsersCredentials
-    // const access = {
-    //  write : ['*'],
-    // }
-    // const db = await orbitNode._orbitdb.keyvalue('UsersCredentials',access)
-    // logger.warn("HI HI HI")
-    // await db.set('dev','{"dev":"DEVELOPER"}')
-    
-    // await db.stop()
-    // }
-    // catch(err)
-    // {
-    //   logger.error(err.message)
-    // }
+  async set_userrecord(key,value,user)
+  {
+    const asset = { "Message" : value,"User" : key, "IsUser" : user, datetime : new Date().toString() }
+    const metadata = { "Orgin" : "Orbit-IPFS" }
+    bigchain.setData(asset,metadata)
   }
+
+  // async load(){
+  //   if (this.ipfs) return
+  //   logger.info('Starting network')
+  //   if(!this.ipfsStore.starting)
+  //   await this.ipfsStore.useEmbeddedIPFS()
+  //   const orbitNode = await this.guestStore.init(this.ipfs)
+  //   this.orbitdb = await orbitNode._orbitdb.open('/orbitdb/zdpuB1S886QjTfFAbTwZMXe9eeMf5suH9rC4M3GkYtQZ1qQPh/UsersCredentials')
+  //   await this.orbitdb.load()
+  //   this.orbitdb.events.on("replicated", () => {
+  //   logger.info("Replicated")
+  //   })
+  // }
   async start () {
     if (this.isOnline) return
     logger.info('Starting network')

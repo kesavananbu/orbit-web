@@ -68,7 +68,7 @@ class ControlPanel extends React.Component {
     if (!this.joinChannelInput) return
     const { networkStore } = this.context
     const channel = this.joinChannelInput.value.trim()
-    networkStore.joinChannel(channel).then(() => {
+    networkStore.joinChannel(channel,true).then(() => {
       this.joinChannelInput.value = ''
       this.redirect(`/channel/${channel}`)
     })
@@ -154,7 +154,7 @@ class ControlPanel extends React.Component {
                 className="closeChannelButton"
                 onClick={() => {
                   if (uiStore.currentChannelName === c.channelName) this.redirect('/')
-                  networkStore.leaveChannel(c.channelName)
+                  networkStore.leaveChannel(c.channelName,true)
                 }}
               >
                 {t('controlPanel.closeChannel')}

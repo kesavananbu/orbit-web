@@ -4,19 +4,20 @@ import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { CSSTransitionGroup } from 'react-transition-group'
 import { useTranslation } from 'react-i18next'
+import { Button } from 'semantic-ui-react'
 
 import '../styles/SubmitButton.scss'
 import '../styles/InputField.scss'
 
-function LoginForm ({ theme, onSubmit, setUsernameInputRef, onCheck }) {
+
+function LoginForm ({ theme, setUsernameInputRef, setPasswordInputRef , onCheck, error }) {
   const [t] = useTranslation()
-  var message
   const [usernameLength, setUsernameLength] = useState(0)
   const [passwordLength, setPasswordLength] = useState(0)
+  const [active,setActive] = useState(false)
 
   const usernameInputRef = useRef()
   const passwordInputRef = useRef()
-  var PasswordRequired = false
 
   useEffect(() => {
     if (typeof setUsernameInputRef === 'function') setUsernameInputRef(usernameInputRef)
@@ -27,9 +28,15 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef, onCheck }) {
     }
   })
 
+    const handleKeyPress = (event) => {
+    if(event.key == 'Enter'){
+      (passwordLength <=0 || usernameLength <=0) ? event.preventDefault() : null
+    }
+  }
+
   return (
-    <form onSubmit={e => passwordLength > 0 ?(onCheck(e, usernameInputRef.current.value.trim(),passwordInputRef.current.value.trim())):(PasswordRequired=true)}>
-      <CSSTransitionGroup
+    <form onSubmit={e => passwordLength > 0 ? onCheck(e, usernameInputRef.current.value.trim(),passwordInputRef.current.value.trim(), active ) : null }>
+      <CSSTransitionGroup 
         transitionName="loginScreenAnimation"
         transitionAppear={true}
         component="div"
@@ -45,6 +52,7 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef, onCheck }) {
             maxLength="32"
             autoFocus
             style={theme}
+            onKeyPress={handleKeyPress}
             onChange={() => setUsernameLength(usernameInputRef.current.value.length)}
           />
         </div>
@@ -53,16 +61,19 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef, onCheck }) {
             ref={passwordInputRef}          
             type="password"
             placeholder={t('Password')}
+            suggested = {active ? t("new-password") : t("current-password") }
             maxLength="32"
             style={theme}
+            onKeyPress={handleKeyPress}
             onChange={() => setPasswordLength(passwordInputRef.current.value.length)}
            />
         </div>
         <div className="connectButtonRow">
-          <span className="hint">{(usernameLength >0  && passwordLength > 0) ? t('login.pressEnterToLogin') : PasswordRequired=false }</span>
-          <span className="hint">{usernameLength > 0 ? null : (PasswordRequired = true ? t('Please provide the username and password'): null )}</span>
-          <span className="hint">{t(usernameLength)}</span>
+          <span className={error ? t('error') : t('hint')}>{ error ? t('Username or Password is incorrect') : (usernameLength >0  && passwordLength > 0) ? t('Press ENTER to proceed') : t('Please provide the username and password') }</span>
           <input type="submit" value="Connect" style={{ display: 'none' }} />
+        </div>
+        <div className="connectButtonRow">
+          <Button toggle active={active} onClick={() => setActive(!active)}>Sign Up</Button>
         </div>
       </CSSTransitionGroup>
     </form>
@@ -71,9 +82,10 @@ function LoginForm ({ theme, onSubmit, setUsernameInputRef, onCheck }) {
 
 LoginForm.propTypes = {
   theme: PropTypes.object.isRequired,
-  onSubmit: PropTypes.func.isRequired,
   setUsernameInputRef: PropTypes.func,
-  onCheck: PropTypes.func.isRequired
+  setPasswordInputRef: PropTypes.func,
+  onCheck: PropTypes.func.isRequired,
+  error : PropTypes.bool.isRequired
 }
 
 export default LoginForm

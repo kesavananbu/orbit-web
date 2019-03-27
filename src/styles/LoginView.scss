@@ -94,6 +94,10 @@ $text-color: rgba(228, 228, 228, 0.9);
       .hint {
         color: rgba(196, 196, 196, 0.8);
       }
+
+      .error {
+        margin-top: 0em;
+      }
     }
 
     .lastRow {
@@ -199,3 +203,56 @@ $text-color: rgba(228, 228, 228, 0.9);
   animation-fill-mode: both;
   animation-timing-function: ease-out;
 }
+
+.ui.button.toggle.active, .ui.buttons .button.toggle.active, .ui.toggle.buttons .active.button {
+  background-color: rgb(133, 63, 112)!important;
+  -webkit-box-shadow: none!important;
+  box-shadow: none!important;
+  text-shadow: none;
+  color: #fff!important;
+}
+.ui.active.button {
+  background-color: #424242;
+  background-image: none;
+  -webkit-box-shadow: 0 0 0 1px transparent inset;
+  box-shadow: 0 0 0 1px transparent inset;
+  color: rgba(0,0,0,.95);
+}
+
+.ui.button {
+  cursor: pointer;
+  display: flex;
+  align-self: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 1em;
+  max-width: 100%;
+  outline: 0;
+  border: none;
+  vertical-align: baseline;
+  background: #e0e1e2 none;
+  color: rgba(0,0,0,.6);
+  margin: 0 .25em 0 0;
+  text-transform: none;
+  text-shadow: none;
+  font-weight: bold;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: .38571429rem;
+  -webkit-box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+  box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,background .1s ease,-webkit-box-shadow .1s ease;
+  transition: opacity .1s ease,background-color .1s ease,color .1s ease,background .1s ease,-webkit-box-shadow .1s ease;
+  transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+  transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease,-webkit-box-shadow .1s ease;
+  will-change: '';
+  -webkit-tap-highlight-color: transparent;
+}
+
+

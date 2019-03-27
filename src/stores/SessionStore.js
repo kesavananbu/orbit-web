@@ -9,7 +9,9 @@ configure({ enforceActions: 'observed' })
 
 const logger = new Logger()
 
-const cookieKey = 'orbit-chat-username'
+const cookieUsernameKey = 'orbit-chat-username'
+const cookiePasswordKey = 'orbit-chat-password'
+const cookieUpdateKey =  'orbit-chat-update'
 
 export default class SessionStore {
   constructor (rootStore) {
@@ -24,7 +26,16 @@ export default class SessionStore {
   @observable
   _user = null
 
+  @observable
+  _update = null
+
   // Public instance variable getters
+  @computed
+  get user ()
+  {
+    if(!this._user || !this._user.username || !this._user.password) return null
+    return this._user
+  }
 
   @computed
   get username () {
@@ -33,8 +44,20 @@ export default class SessionStore {
   }
 
   @computed
+  get password () {
+    if (!this._user || !this._user.password) return null
+    return this._user.password
+  }
+
+  @computed
+  get IsNeedUpdate() {
+    if (!this._update) return null
+    return this._update
+  }
+
+  @computed
   get isAuthenticated () {
-    return !!(this._user && this._user.username)
+    return !!(this._user && this._user.username && this._user.password)
   }
 
   // Private instance actions
@@ -43,32 +66,61 @@ export default class SessionStore {
   @action.bound
   async _setUser (user) {
     if (user && !user.username) throw new Error('"user.username" is not defined')
+    if (user && !user.password) throw new Error('"user.password" is not defined')
     runInAction(() => {
       this._user = user
     })
     this._cacheUser(user)
   }
 
+  @action.bound
+  async _setUpdate (value){
+    runInAction(() => {
+      this._update = value
+    })
+    this._cacheUpdate(value)
+  }
   // Private instance methods
 
   _readUserFromCache () {
-    const username = cookies.getCookie(cookieKey)
-    return username ? { username } : null
+    const username = cookies.getCookie(cookieUsernameKey)
+    const password = cookies.getCookie(cookiePasswordKey)
+    return username ? { username, password } : null
+  }
+
+  _readUpdateFromCache () {
+    const value = cookies.getCookie(cookieUpdateKey)
+    return value ? value : null
   }
 
   _cacheUser (user) {
     if (user) {
-      cookies.setCookie(cookieKey, user.username, 1)
+      cookies.setCookie(cookieUsernameKey, user.username, 1)
+      cookies.setCookie(cookiePasswordKey, user.password, 1)
     } else {
-      cookies.expireCookie(cookieKey)
+      cookies.expireCookie(cookieUsernameKey)
+      cookies.expireCookie(cookiePasswordKey)
     }
   }
 
+  _cacheUpdate(value)
+  {
+    if(value)
+      cookies.setCookie(cookieUpdateKey,value,1)
+    else
+      cookies.expireCookie(cookieUpdateKey)   
+  }
   // Public instance methods
 
   loadFromCache () {
     const cached = this._readUserFromCache()
+    const cachedupdate=this._readUpdateFromCache()
+    if(cachedupdate) this._setUpdate(cachedupdate)
     if (cached) this.login(cached)
+  }
+
+  update (value) {
+    if(value) this._setUpdate(value)
   }
 
   login (user) {

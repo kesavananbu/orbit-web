@@ -15,7 +15,6 @@ const App = LoadAsync({
 if (process.env.NODE_ENV === 'production') {
   offlinePluginRuntime.install()
 }
-
 render(<App />, document.getElementById('root'))
 
 console.info(`Version ${version} running in ${process.env.NODE_ENV} mode`)
