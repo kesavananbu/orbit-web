@@ -24,6 +24,8 @@ export default class NetworkStore {
     this.ipfsStore = new IpfsStore(this)
     this.orbitStore = new OrbitStore(this)
     this.joinChannel = this.joinChannel.bind(this)
+    this.get_userrecord = this.get_userrecord.bind(this)
+    this.change_credentials = this.change_credentials.bind(this)
     this.channelPeerInterval = setInterval(() => {
       this.channelsAsArray.forEach(c => c.updatePeers())
     }, peerUpdateInterval)
@@ -153,8 +155,14 @@ export default class NetworkStore {
       await this.orbit.leave(channelName)
       if(value == true) this.update_channels()
     }
+  
   }
-    
+  
+  async change_credentials(){
+    this.update_credentials()
+    this.update_channels()
+  }
+
   async update_channels()
   {
     var channel_settings = {}

@@ -1,7 +1,7 @@
 'use strict'
 
 import { action, computed, configure, observable, reaction, runInAction, values } from 'mobx'
-
+import {encrypt_message,decrypt_message,encrypt,decrypt,md5} from '../utils/crypto'
 import { throttleFunc } from '../utils/throttle'
 import Logger from '../utils/logger'
 
@@ -112,8 +112,12 @@ export default class ChannelStore {
   @computed
   get messages () {
     // Format entries to better suit a chat channel
-    return this.entries.map(entry =>
-      Object.assign(JSON.parse(JSON.stringify(entry.payload.value)), {
+    var entries= JSON.parse(JSON.stringify(this.entries))
+    Object.keys(entries).map(function(key, index) {
+    entries[key].payload.value.content = decrypt_message(entries[key].payload.value.content)
+    });
+    return entries.map(entry =>
+      Object.assign(entry.payload.value, {
         hash: entry.cid,
         userIdentity: entry.identity,
         unread: !entry.seen
@@ -279,7 +283,7 @@ export default class ChannelStore {
     if (typeof text !== 'string' || text === '') return Promise.resolve()
 
     this._incrementSendingMessageCounter()
-
+    text = encrypt_message(text)
     return new Promise((resolve, reject) => {
       this._sendQueue.push({ text, resolve, reject })
     })

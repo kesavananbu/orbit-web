@@ -41,12 +41,13 @@ class LoginView extends React.Component {
   
   constructor (props) {
     super(props)
-    this.onConfigure = this.onConfigure.bind(this)
     this.onLogin = this.onLogin.bind(this)
     this.onCheck = this.onCheck.bind(this)
+    this.validateData = this.validateData.bind(this)
     this.focusUsernameInput = this.focusUsernameInput.bind(this)
     this.focusPasswordInput = this.focusPasswordInput.bind(this)
     this.onError = this.onError.bind(this) 
+    
   }
 
   state = {
@@ -71,12 +72,11 @@ class LoginView extends React.Component {
       (resolve) => (
         this.validateData(resolve,password) === 'Success' ?
           AccessGuest.get_userrecord(md5(`${username}[channels]`)).then(
-            (resolve) => this.validateData(resolve,password).then(res => this.onLogin(e,username,password)),
+            (resolve) => this.validateData(resolve,password) === 'Success' ? this.onLogin(e,username,password): null,
             (reject) =>  this.onLogin(e,username,password))
             : this.onError(e,'Username or Password is incorrect')),
       (reject) => this.onError(e,'Username not found'))
     }
-    
   }
 
   validateData(result,password)
@@ -112,7 +112,7 @@ class LoginView extends React.Component {
     this.errorhandle(false)
     e.preventDefault()
     if(update)
-      sessionStore.updae(true)
+      sessionStore.update(true)
     if (username !== '' && password !== '') {
       password = md5(password)
       sessionStore.login({ username,password }).catch(e => {

@@ -22,6 +22,7 @@ export function encrypt_message(value) {
 }
 
 export function decrypt_message (value) {
-  return CryptoJs.AES.decrypt(value, masterkey).toString(CryptoJs.enc.Utf8)
-}
+  const d_value = CryptoJs.AES.decrypt(value, masterkey).toString(CryptoJs.enc.Utf8) 
+  return d_value == "" ? value : d_value
+} 
 

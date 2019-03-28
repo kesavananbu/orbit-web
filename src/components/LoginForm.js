@@ -24,7 +24,7 @@ function LoginForm ({ theme, setUsernameInputRef, setPasswordInputRef , onCheck,
   const [strength, setStrength] = useState(0)
   const usernameInputRef = useRef()
   const passwordInputRef = useRef()
-  const minStrength = 3, thresholdLength = 7 
+  const minStrength = 2, thresholdLength = 7 
 
   useEffect(() => {
     if (typeof setUsernameInputRef === 'function') setUsernameInputRef(usernameInputRef)
@@ -110,6 +110,7 @@ function LoginForm ({ theme, setUsernameInputRef, setPasswordInputRef , onCheck,
             ref={usernameInputRef}
             type="text"
             placeholder={t('Email')}
+            required autoComplete="email"
             maxLength="32"
             autoFocus
             style={theme}
@@ -125,7 +126,7 @@ function LoginForm ({ theme, setUsernameInputRef, setPasswordInputRef , onCheck,
             ref={passwordInputRef}          
             type="password"
             placeholder={t('Password')}
-            suggested = {active ? t("new-password") : t("current-password") }
+            required autoComplete={active ? t("new-password") : t("current-password")}
             maxLength="32"
             style={theme}
             onKeyPress={handleKeyPress}

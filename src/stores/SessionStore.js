@@ -16,7 +16,8 @@ const cookieUpdateKey =  'orbit-chat-update'
 export default class SessionStore {
   constructor (rootStore) {
     this.rootStore = rootStore
-
+    this.update = this.update.bind(this)
+    this.changePassword = this.changePassword.bind(this)
     this.login = this.login.bind(this)
     this.logout = this.logout.bind(this)
   }
@@ -120,7 +121,13 @@ export default class SessionStore {
   }
 
   update (value) {
-    if(value) this._setUpdate(value)
+    this._setUpdate(value)
+  }
+
+  changePassword(password) {
+    this.update(true)
+    const username= this.username
+    this._setUser({username,password})
   }
 
   login (user) {

@@ -22,9 +22,67 @@
     select, option {
       font-weight: bold;
     }
+
+
+    .ui.button.toggle.active, .ui.buttons .button.toggle.active, .ui.toggle.buttons .active.button {
+      background-color: rgb(133, 63, 112)!important;
+      -webkit-box-shadow: none!important;
+      box-shadow: none!important;
+      text-shadow: none;
+      color: #fff!important;
+    }
+    .ui.active.button {
+      background-color: #424242;
+      background-image: none;
+      -webkit-box-shadow: 0 0 0 1px transparent inset;
+      box-shadow: 0 0 0 1px transparent inset;
+      color: rgba(0,0,0,.95);
+    }
+
+    .ui.active.button:disabled {
+      -webkit-filter : blur(.5px);
+      opacity:0.2;
+    }
+
+    
+    .ui.button {
+      margin-top: .5em;  
+      cursor: pointer;
+      display: flex;
+      align-self: flex-start;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 1em;
+      max-width: 100%;
+      outline: 0;
+      border: none;
+      vertical-align: baseline;
+      background: #e0e1e2 none;
+      color: rgba(0,0,0,.6);
+      text-transform: none;
+      text-shadow: none;
+      font-weight: bold;
+      line-height: 1em;
+      font-style: normal;
+      text-align: center;
+      text-decoration: none;
+      border-radius: .38571429rem;
+      -webkit-box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+      box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,background .1s ease,-webkit-box-shadow .1s ease;
+      transition: opacity .1s ease,background-color .1s ease,color .1s ease,background .1s ease,-webkit-box-shadow .1s ease;
+      transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+      transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease,-webkit-box-shadow .1s ease;
+      will-change: '';
+      -webkit-tap-highlight-color: transparent;
+    }
   }
 
-  .key {
+  .key {  
     font-weight: bold;
     display: inline-block;
     vertical-align: top;
@@ -43,5 +101,21 @@
     animation-fill-mode: both;
     animation-timing-function: ease-in;
   }
+
+  .error {
+    color: rgba(240, 96, 96, 0.8);
+    text-align: center;
+  }
+
+  input[type=password] {
+    border-bottom: 1px solid #a951af;
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  input[type=password]:disabled{
+      -webkit-filter : blur(1px);
+      opacity:0.2;
+    }
 
 }

@@ -8,13 +8,16 @@ import { withTranslation } from 'react-i18next'
 import { CSSTransitionGroup } from 'react-transition-group'
 
 import settingsOptions from '../config/setting.options.json'
-
+import LoadAsync from '../components/Loadable'
 import locales from '../locales'
 import themes from '../themes'
-
 import RootStoreContext from '../context/RootStoreContext'
 
 import '../styles/SettingsView.scss'
+
+const ChangePasswordForm = LoadAsync({
+  loader: () => import(/* webpackChunkName: "LoginForm" */ '../components/ChangePasswordForm')
+})
 
 settingsOptions.themeName.options = Object.keys(themes)
 settingsOptions.language.options = Object.keys(locales)
@@ -29,9 +32,17 @@ class SettingsView extends React.Component {
   constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
+    this.handlepasswordChange = this.handlepasswordChange.bind(this)
     this.renderField = this.renderField.bind(this)
     this.renderSelectField = this.renderSelectField.bind(this)
     this.renderBooleanField = this.renderBooleanField.bind(this)
+    
+  
+    this.focusPasswordInput = this.focusPasswordInput.bind(this)
+  }
+
+  focusPasswordInput () {
+    if (this.passwordInputRef) this.passwordInputRef.current.focus()
   }
 
   componentDidMount () {
@@ -46,7 +57,14 @@ class SettingsView extends React.Component {
     const value = target.type === 'checkbox' ? target.checked : target.value
     uiStore[field.name] = value
   }
+  handlepasswordChange (password) {
+    
+    const { sessionStore,networkStore } = this.context
+    
+    sessionStore.changePassword(password)
+    networkStore.change_credentials()
 
+  }
   renderSelectField (field) {
     const { uiStore } = this.context
     const { t } = this.props
@@ -110,8 +128,17 @@ class SettingsView extends React.Component {
     )
   }
 
-  render () {
-    return <div className="SettingsView">{Object.keys(settingsOptions).map(this.renderField)}</div>
+  render () {    
+    const { sessionStore } = this.context
+    const passwordhash = sessionStore.password
+    return (<div className="SettingsView">{Object.keys(settingsOptions).map(this.renderField)}
+    <ChangePasswordForm
+          setPasswordInputRef={ref => (this.passwordInputRef = ref)}
+          onSave={this.handlepasswordChange}
+          oldpassword = {passwordhash}
+      />
+      </div>
+    )
   }
 }
 
