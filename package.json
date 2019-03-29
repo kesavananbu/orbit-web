@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "./node_modules/.bin/webpack-dev-server --mode=development",
     "build": "./node_modules/.bin/webpack --mode=production",
-    "test": "NODE_ENV=test NODE_PATH=./src ./node_modules/.bin/mocha -r test/init.js --recursive",
+    "test": "SET NODE_ENV=test SET NODE_PATH=./src ./node_modules/.bin/mocha -r test/init.js --recursive",
     "lint": "eslint src/",
     "analyze": "./node_modules/.bin/webpack-bundle-analyzer stats.json",
     "analyze-dist": "./node_modules/.bin/webpack-bundle-analyzer ./dist/stats.json"

@@ -115,7 +115,7 @@ const config = {
        }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
-      generateStatsFile: true,
+      generateStatsFile: false,
       statsOptions: { source: false }
     })
   ]
@@ -141,8 +141,8 @@ module.exports = (env, argv) => {
     config.plugins = config.plugins.concat([
       new CleanWebpackPlugin(['dist']),
       new WebpackPwaManifest({
-        short_name: 'orbit-chat',
-        name: 'Orbit Chat',
+        short_name: 'P2DB-Chat',
+        name: 'P2DB Chat',
         description: 'A distributed, peer-to-peer chat application built on IPFS',
         theme_color: '#202020',
         background_color: '#202020',

@@ -34,6 +34,12 @@ function LoginForm ({ theme, setUsernameInputRef, setPasswordInputRef , onCheck,
       if (typeof setPasswordInputRef === 'function') setPasswordInputRef(null)
     }
   })
+
+
+  const signuphandle= () => {
+    
+
+  }
     const validateUsername = () => {
       const email = usernameInputRef.current.value
       setUsernameLength(usernameInputRef.current.value.length)
@@ -141,7 +147,7 @@ function LoginForm ({ theme, setUsernameInputRef, setPasswordInputRef , onCheck,
           <input type="submit" value="Connect" style={{ display: 'none' }} />
         </div>
         <div className="connectButtonRow">
-          <Button toggle active={active} onClick={() => setActive(!active)}>Sign Up</Button>
+          <Button toggle active={active} onClick={function(e) { setActive(!active); e.preventDefault(); }}>Sign Up</Button>
         </div>
       </CSSTransitionGroup>
     </form>
