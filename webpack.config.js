@@ -131,7 +131,7 @@ module.exports = (env, argv) => {
       compress: true,
       hot: true,
       port: 8001,
-      publicPath: '/'
+      publicPath: '/ipns/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7'
     }
 
     config.plugins.push(new webpack.HotModuleReplacementPlugin())
