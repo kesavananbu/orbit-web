@@ -131,7 +131,7 @@ module.exports = (env, argv) => {
       compress: true,
       hot: true,
       port: 8001,
-      publicPath: '/ipns/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7'
+      publicPath: '/'
     }
 
     config.plugins.push(new webpack.HotModuleReplacementPlugin())
@@ -154,7 +154,7 @@ module.exports = (env, argv) => {
           }
         ],
         display: 'standalone',
-        start_url: '/'
+        start_url: '/ipns/QmT5gJhVMULVGvWUcjHmwMrfE71C4MyG1rTpkrqwZigJF7'
       }),
       new OfflinePlugin({ autoUpdate: true })
     ])
