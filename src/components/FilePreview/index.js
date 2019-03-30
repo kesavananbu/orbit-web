@@ -52,7 +52,7 @@ async function loadPreviewContent (loadFunc, hash, name, mimeType) {
     } else if (fileIsImage) {
       return <PreviewImageFile src={srcUrl} />
     } else if (fileIsVideo) {
-      return <PreviewVideoFile src={srcUrl} stream={stream} filename={name} mimeType={mimeType} />
+      return <PreviewVideoFile loadAsBlob={async () => loadFunc(hash, false)} src={srcUrl} stream={stream} filename={name} mimeType={mimeType} />
     } else {
       return <PreviewTextFile blob={blob} filename={name} />
     }
