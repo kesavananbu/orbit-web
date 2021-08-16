@@ -4,7 +4,7 @@
 
 > A distributed, peer-to-peer chat application built on [IPFS](http://ipfs.io)
 
-Browser application for [Orbit](https://github.com/orbitdb/orbit). Try it at https://orbit.chat.
+Browser application for [Orbit](https://github.com/orbitdb/orbit). Try it at https://ipfs.io/ipfs/QmeLBXoRoLmvv5MTBRgiKZTQeypN8z7eRBFFRtUPQsxyWD.
 
 Built with the following packages:
 
